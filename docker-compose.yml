@@ -9,3 +9,34 @@ services:
     ports:
       - 8000:8000
     restart: always 
+
+  redis:
+    container_name: redis
+    image: redis:6.2-alpine
+
+  celery_worker:
+    container_name: celery_worker
+    build: ./src
+    command: celery -A app.celery_worker worker --loglevel=info
+    volumes:
+      - ./src:/usr/src/app
+    environment:
+      - CELERY_BROKER_URL=${CELERY_BROKER_URL}
+      - CELERY_RESULT_BACKEND=${CELERY_RESULT_BACKEND}
+    depends_on:
+      - app
+      - redis
+
+  flower:
+    container_name: flower
+    build: ./src
+    command: celery -A app.celery_worker.celery flower --port=5555
+    ports:
+      - 5556:5555
+    environment:
+      - CELERY_BROKER_URL=${CELERY_BROKER_URL}
+      - CELERY_RESULT_BACKEND=${CELERY_RESULT_BACKEND}
+    depends_on:
+      - app
+      - redis
+      - celery_worker
