@@ -1,0 +1,11 @@
+version: '3.8'
+services:
+  app:
+    container_name: app
+    build: ./src
+    command: bash -c "uvicorn app.main:app --host 0.0.0.0 --port 8000 --reload"
+    volumes:
+      - ./src:/usr/src/app
+    ports:
+      - 8000:8000
+    restart: always 
