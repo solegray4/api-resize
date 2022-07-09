@@ -4,10 +4,13 @@ from PIL import Image
 
 from celery import Celery
 from dotenv import load_dotenv
+from app.core.config import CELERY_BACKEND, CELERY_BROKER
 
 from app.core.files import PATH_FILES_ORIGINAL, PATH_FILES_RESIZED
 
-celery = Celery(__name__, backend='redis://redis:6379/0', broker='redis://redis:6379/0')
+celery = Celery(__name__)
+celery.conf.broker_url = CELERY_BROKER
+celery.conf.result_backend = CELERY_BACKEND
 celery.conf.update(
    result_extended=True
 )
