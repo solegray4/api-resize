@@ -1,7 +1,9 @@
 from fastapi import FastAPI, File, HTTPException, UploadFile
+from fastapi.responses import JSONResponse
+from celery.result import AsyncResult
 
 from app.celery_worker import resize_image_task
-from app.core.files import PATH_FILES_ORIGINAL
+from app.core.files import PATH_FILES_ORIGINAL, PATH_FILES_RESIZED
 
 app = FastAPI()
 
@@ -29,3 +31,21 @@ async def resize_image(file: UploadFile = File(...)):
         "task_id": str(task), 
         "task_status": "Processing"
     }
+
+@app.get("/results/{task_id}")
+async def task_results(task_id:str):
+    task = AsyncResult(task_id)
+    if not task.ready():
+        return JSONResponse(
+            status_code=202,
+            content={
+                "task_id": str(task_id), 
+                "task_status": "Processing"
+                })
+    result = task.get()
+
+    return {
+        "task_id": task_id, 
+        "task_status": "Success",
+        "outcome": str(result)
+        }
