@@ -1,9 +1,10 @@
 from fastapi import FastAPI, File, HTTPException, UploadFile
 from fastapi.responses import JSONResponse, FileResponse
 from celery.result import AsyncResult
+from PIL import Image
 
 from app.celery_worker import resize_image_task
-from app.core.files import PATH_FILES_ORIGINAL, PATH_FILES_RESIZED
+from app.files import PATH_FILES_ORIGINAL, PATH_FILES_RESIZED
 
 app = FastAPI()
 
@@ -15,13 +16,18 @@ def ping():
 async def resize_image(file: UploadFile = File(...)):
     try:
         contents = await file.read()
-        with open(PATH_FILES_ORIGINAL+ file.filename, 'wb+') as f:
+        with open(PATH_FILES_ORIGINAL / file.filename, 'wb+') as f:
             f.write(contents)
     except Exception:
         raise HTTPException(status_code=400, detail={"error": "There was an error uploading the file"})
 
     try: 
-        task = resize_image_task.delay(file.filename)
+        img = Image.open(PATH_FILES_ORIGINAL / file.filename, mode="r")
+    except:
+         raise HTTPException(status_code=400, detail={"error": "Invalid image"})
+    try:
+        image = {'filename': file.filename, "image_size": str(img.size)}
+        task = resize_image_task.delay(image)
     except Exception:
         raise HTTPException(status_code=500, detail={"error": "There was an error resizing the file"})
     finally:
@@ -43,10 +49,9 @@ async def task_results(task_id:str):
                 "task_status": "Processing"
                 })
     result = task.get()
-    image_path = PATH_FILES_RESIZED + result.get('filename')
     return {
         "task_id": str(task_id), 
-        "task_status": "Processing",
+        "task_status": "Succeeded",
         "outcome": result
         }
 
@@ -62,5 +67,5 @@ async def image_download(task_id:str):
                 })
     result = task.get()
     filename = result.get('filename')
-    image_path = PATH_FILES_RESIZED + filename
+    image_path = PATH_FILES_RESIZED / filename
     return FileResponse(image_path)
