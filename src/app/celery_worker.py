@@ -1,7 +1,6 @@
 from PIL import Image
 
 from celery import Celery
-from dotenv import load_dotenv
 from app.core.config import CELERY_BACKEND, CELERY_BROKER
 
 from app.files import PATH_FILES_ORIGINAL, PATH_FILES_RESIZED
