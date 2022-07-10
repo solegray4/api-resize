@@ -9,9 +9,11 @@ FastAPI api used to resize images on request
 
 ## View running application:
 View monitoring of celery task:
+
     $ http://localhost:5556
 
 View running app documentation on swagger endpoint:
+
     $ http://0.0.0.0:8000/docs
 
 one can also view all the endpoints available here.
@@ -37,6 +39,7 @@ some things to consider for future features or improvements
 - introduce logging functionality for api
 - introduce feature to get all outstanding celery tasks
 - reduce the privileges of the celery worker from super user
+- create continuous integration workflows and pipelines
 
 some features that can be implemented to extend current functionality:
 - create endpoint for batch upload as well as batch celery task. 
