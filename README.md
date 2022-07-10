@@ -21,9 +21,10 @@ one can also view all the endpoints available here.
 ## Sample app running:
 
 One can make use of swagger UI created and upload image from the sample images:
+
     $ visit http://localhost:8000/docs
     
-    $ try application by uploading image from app/core/media/sample_images directory
+try application by uploading image from app/core/media/sample_images directory
 
 ## Running Tests:
 
@@ -42,13 +43,15 @@ some things to consider for future features or improvements
 - create continuous integration workflows and pipelines
 
 some features that can be implemented to extend current functionality:
+
 - create endpoint for batch upload as well as batch celery task. 
 - Can be implemented by uploading list of images and create appropriate celery task
 
 improvements in testing:
-    $ could mock out test calls to and from celery work in order to better test endpoints
-    $ clean up of directory after testing
-    $ edge scenario not tested in size where there might be error in upload
+
+- could mock out test calls to and from celery work in order to better test endpoints
+- clean up of directory after testing
+- edge scenario not tested in size where there might be error in upload
 
 ## Architecture design:
 this entire application is containerized  with the following architecture
